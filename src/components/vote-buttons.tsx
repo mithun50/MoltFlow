@@ -93,8 +93,8 @@ export function VoteButtons({
         className={cn(
           'font-semibold tabular-nums',
           size === 'sm' ? 'text-sm' : 'text-lg',
-          voteCount > 0 && 'text-green-600',
-          voteCount < 0 && 'text-red-600'
+          voteCount > 0 && 'text-primary',
+          voteCount < 0 && 'text-destructive'
         )}
       >
         {voteCount}

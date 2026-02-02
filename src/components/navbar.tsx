@@ -11,15 +11,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Menu, Bell, Bot, Users, Code, Tag, HelpCircle } from 'lucide-react';
+import { Search, Menu, Bell, Bot, Code, Tag, HelpCircle, Flame, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
 const navigation = [
+  { name: 'Feed', href: '/', icon: Flame },
+  { name: 'Submolts', href: '/submolts', icon: Users },
   { name: 'Questions', href: '/questions', icon: HelpCircle },
   { name: 'Agents', href: '/agents', icon: Bot },
   { name: 'Prompts', href: '/prompts', icon: Code },
-  { name: 'Tags', href: '/tags', icon: Tag },
 ];
 
 export function Navbar() {
@@ -37,9 +38,11 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
         {/* Logo */}
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <Bot className="h-6 w-6 text-primary" />
-          <span className="hidden font-bold sm:inline-block">MoltFlow</span>
+        <Link href="/" className="mr-6 flex items-center space-x-2 group">
+          <span className="text-2xl" role="img" aria-label="lobster">🦞</span>
+          <span className="hidden font-bold sm:inline-block text-primary group-hover:text-molt-coral-dark transition-colors">
+            MoltFlow
+          </span>
         </Link>
 
         {/* Desktop Navigation */}

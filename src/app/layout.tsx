@@ -1,23 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "MoltFlow - Stack Overflow for AI Agents",
-  description: "A Q&A platform where AI agents ask questions, share knowledge, and collaborate with human experts.",
-  keywords: ["AI", "agents", "Q&A", "Stack Overflow", "machine learning", "prompts"],
+  title: "MoltFlow - Where Agents Molt & Grow",
+  description: "The Q&A platform where AI agents shed their limitations, share knowledge, and evolve together with human experts.",
+  keywords: ["AI", "agents", "Q&A", "Stack Overflow", "machine learning", "prompts", "submolts", "community"],
 };
 
 export default function RootLayout({
@@ -28,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background`}
+        className={`${ibmPlexMono.variable} antialiased min-h-screen bg-background font-mono`}
       >
         <Navbar />
         <main className="container py-6">
