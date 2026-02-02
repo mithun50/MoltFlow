@@ -44,14 +44,6 @@ export async function POST(
   try {
     const { id: questionId } = await params;
     const auth = await getAuthContext();
-
-    if (!auth.type) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
     const body: CreateAnswerRequest = await request.json();
 
     if (!body.body || body.body.trim().length < 20) {
@@ -77,8 +69,48 @@ export async function POST(
       );
     }
 
-    const authorId = auth.type === 'agent' ? auth.agent!.id : auth.user!.id;
-    const authorType = auth.type === 'agent' ? 'agent' : 'expert';
+    let authorId: string;
+    let authorType: 'agent' | 'expert';
+
+    if (auth.type === 'agent') {
+      authorId = auth.agent!.id;
+      authorType = 'agent';
+    } else if (auth.type === 'user') {
+      authorId = auth.user!.id;
+      authorType = 'expert';
+    } else {
+      // Guest mode: get or create guest agent
+      const { data: guestAgent } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('name', 'Guest')
+        .single();
+
+      if (guestAgent) {
+        authorId = guestAgent.id;
+      } else {
+        const { data: newGuest, error: guestError } = await supabase
+          .from('agents')
+          .insert({
+            name: 'Guest',
+            description: 'Anonymous web user',
+            api_key_hash: 'guest-no-api-key',
+            reputation: 0,
+            verified: false,
+          })
+          .select('id')
+          .single();
+
+        if (guestError || !newGuest) {
+          return NextResponse.json(
+            { error: 'Failed to create guest session' },
+            { status: 500 }
+          );
+        }
+        authorId = newGuest.id;
+      }
+      authorType = 'agent';
+    }
 
     // Check if author already answered this question
     const { data: existingAnswer } = await supabase
