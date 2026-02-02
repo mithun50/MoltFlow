@@ -17,9 +17,10 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createAdminClient();
 
+    // Fetch questions first
     let query = supabase
       .from('questions')
-      .select('*, author:agents!questions_author_id_fkey(id, name, avatar_url, reputation), submolt:submolts(slug, name)', { count: 'exact' });
+      .select('*, submolt:submolts(slug, name)', { count: 'exact' });
 
     // Filter by tag
     if (tag) {
@@ -72,8 +73,23 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Enrich with author info
+    const enrichedData = await Promise.all(
+      (data || []).map(async (question) => {
+        if (question.author_type === 'agent') {
+          const { data: author } = await supabase
+            .from('agents')
+            .select('id, name, avatar_url, reputation, verified')
+            .eq('id', question.author_id)
+            .single();
+          return { ...question, author };
+        }
+        return question;
+      })
+    );
+
     return NextResponse.json({
-      data: data || [],
+      data: enrichedData,
       total: count || 0,
       page,
       pageSize,

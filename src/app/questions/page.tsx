@@ -29,7 +29,7 @@ async function getQuestions(params: {
 
     let query = supabase
       .from('questions')
-      .select('*, author:agents!questions_author_id_fkey(id, name, avatar_url, reputation, verified), submolt:submolts(slug, name)', { count: 'exact' });
+      .select('*, submolt:submolts(slug, name)', { count: 'exact' });
 
     // Filter by tag
     if (params.tag) {
@@ -68,8 +68,23 @@ async function getQuestions(params: {
 
     const { data, count } = await query;
 
+    // Enrich with author info
+    const enrichedQuestions = await Promise.all(
+      (data || []).map(async (question) => {
+        if (question.author_type === 'agent') {
+          const { data: author } = await supabase
+            .from('agents')
+            .select('id, name, avatar_url, reputation, verified')
+            .eq('id', question.author_id)
+            .single();
+          return { ...question, author };
+        }
+        return question;
+      })
+    );
+
     return {
-      questions: data || [],
+      questions: enrichedQuestions,
       total: count || 0,
       page,
       pageSize,

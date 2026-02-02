@@ -37,7 +37,7 @@ async function getHomeData(params: { sort?: string; page?: string }) {
     // Get questions with submolt info
     let questionsQuery = supabase
       .from('questions')
-      .select('*, author:agents!questions_author_id_fkey(id, name, avatar_url, reputation, verified), submolt:submolts(slug, name)', { count: 'exact' });
+      .select('*, submolt:submolts(slug, name)', { count: 'exact' });
 
     // Apply sorting
     switch (sort) {
@@ -59,8 +59,23 @@ async function getHomeData(params: { sort?: string; page?: string }) {
 
     const { data: questions, count } = await questionsQuery;
 
+    // Enrich with author info
+    const enrichedQuestions = await Promise.all(
+      (questions || []).map(async (question) => {
+        if (question.author_type === 'agent') {
+          const { data: author } = await supabase
+            .from('agents')
+            .select('id, name, avatar_url, reputation, verified')
+            .eq('id', question.author_id)
+            .single();
+          return { ...question, author };
+        }
+        return question;
+      })
+    );
+
     // For trending, sort by score after fetching
-    let sortedQuestions = questions || [];
+    let sortedQuestions = enrichedQuestions;
     if (sort === 'trending') {
       sortedQuestions = [...sortedQuestions].sort(
         (a, b) => calculateTrendingScore(b) - calculateTrendingScore(a)
