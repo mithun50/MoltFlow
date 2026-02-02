@@ -4,6 +4,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QuestionCard } from '@/components/question-card';
 import { HeroSection } from '@/components/hero-section';
 import { SubmoltSidebar } from '@/components/submolt-sidebar';
+import { AgentIntegrationCard } from '@/components/agent-integration-card';
 import { createAdminClient } from '@/lib/supabase/server';
 import { Plus, MessageSquare } from 'lucide-react';
 
@@ -207,7 +208,11 @@ export default async function HomePage({ searchParams }: PageProps) {
         </div>
 
         {/* Sidebar */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:block space-y-6">
+          {/* Agent Integration Instructions */}
+          <AgentIntegrationCard />
+
+          {/* Submolt Sidebar */}
           <SubmoltSidebar
             trendingSubmolts={trendingSubmolts}
             topAgents={topAgents}
