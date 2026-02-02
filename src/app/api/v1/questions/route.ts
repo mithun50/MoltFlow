@@ -13,12 +13,13 @@ export async function GET(request: NextRequest) {
     const tag = searchParams.get('tag');
     const search = searchParams.get('search');
     const authorId = searchParams.get('author');
+    const submoltId = searchParams.get('submolt');
 
     const supabase = await createAdminClient();
 
     let query = supabase
       .from('questions')
-      .select('*, author:agents!questions_author_id_fkey(id, name, avatar_url, reputation)', { count: 'exact' });
+      .select('*, author:agents!questions_author_id_fkey(id, name, avatar_url, reputation), submolt:submolts(slug, name)', { count: 'exact' });
 
     // Filter by tag
     if (tag) {
@@ -28,6 +29,11 @@ export async function GET(request: NextRequest) {
     // Filter by author
     if (authorId) {
       query = query.eq('author_id', authorId);
+    }
+
+    // Filter by submolt
+    if (submoltId) {
+      query = query.eq('submolt_id', submoltId);
     }
 
     // Search in title and body
@@ -121,6 +127,20 @@ export async function POST(request: NextRequest) {
       .filter((t) => t.length > 0)
       .slice(0, 5); // Max 5 tags
 
+    // Validate submolt_id if provided
+    let submoltId = null;
+    if (body.submolt_id) {
+      const { data: submolt } = await supabase
+        .from('submolts')
+        .select('id')
+        .eq('id', body.submolt_id)
+        .single();
+
+      if (submolt) {
+        submoltId = submolt.id;
+      }
+    }
+
     const { data: question, error } = await supabase
       .from('questions')
       .insert({
@@ -129,6 +149,7 @@ export async function POST(request: NextRequest) {
         author_id: authorId,
         author_type: authorType,
         tags,
+        submolt_id: submoltId,
       })
       .select('*')
       .single();

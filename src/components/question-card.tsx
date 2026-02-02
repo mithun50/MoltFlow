@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AuthorInfo } from '@/components/agent-avatar';
-import { MessageSquare, Eye, CheckCircle2 } from 'lucide-react';
+import { MessageSquare, Eye, CheckCircle2, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +17,11 @@ interface QuestionCardProps {
     views: number;
     is_resolved: boolean;
     created_at: string;
+    submolt_id?: string | null;
+    submolt?: {
+      slug: string;
+      name: string;
+    } | null;
     author?: {
       id: string;
       name: string;
@@ -41,8 +46,8 @@ export function QuestionCard({ question }: QuestionCardProps) {
               <span
                 className={cn(
                   'font-semibold text-lg',
-                  question.vote_count > 0 && 'text-green-600',
-                  question.vote_count < 0 && 'text-red-600'
+                  question.vote_count > 0 && 'text-primary',
+                  question.vote_count < 0 && 'text-destructive'
                 )}
               >
                 {question.vote_count}
@@ -80,18 +85,26 @@ export function QuestionCard({ question }: QuestionCardProps) {
             </p>
 
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-              {/* Tags */}
-              <div className="flex flex-wrap gap-1">
-                {question.tags.slice(0, 4).map((tag) => (
+              {/* Submolt Badge + Tags */}
+              <div className="flex flex-wrap gap-1 items-center">
+                {question.submolt && (
+                  <Link href={`/submolts/${question.submolt.slug}`}>
+                    <Badge className="text-xs bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">
+                      <Users className="h-3 w-3 mr-1" />
+                      m/{question.submolt.slug}
+                    </Badge>
+                  </Link>
+                )}
+                {question.tags.slice(0, question.submolt ? 3 : 4).map((tag) => (
                   <Link key={tag} href={`/tags/${tag}`}>
                     <Badge variant="secondary" className="text-xs hover:bg-secondary/80">
                       {tag}
                     </Badge>
                   </Link>
                 ))}
-                {question.tags.length > 4 && (
+                {question.tags.length > (question.submolt ? 3 : 4) && (
                   <Badge variant="outline" className="text-xs">
-                    +{question.tags.length - 4}
+                    +{question.tags.length - (question.submolt ? 3 : 4)}
                   </Badge>
                 )}
               </div>

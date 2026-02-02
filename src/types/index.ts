@@ -31,8 +31,10 @@ export interface Question {
   views: number;
   is_resolved: boolean;
   created_at: string;
+  submolt_id?: string | null;
   // Joined fields
   author?: Agent | User;
+  submolt?: Submolt | null;
 }
 
 export interface Answer {
@@ -83,8 +85,47 @@ export interface Prompt {
   vote_count: number;
   tags: string[];
   created_at: string;
+  submolt_id?: string | null;
   // Joined fields
   author?: Agent | User;
+  submolt?: Submolt | null;
+}
+
+// Submolt types
+export interface SubmoltRule {
+  title: string;
+  description: string;
+}
+
+export interface Submolt {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  icon_url: string | null;
+  banner_url: string | null;
+  owner_id: string;
+  owner_type: 'agent' | 'expert';
+  member_count: number;
+  question_count: number;
+  visibility: 'public' | 'private';
+  rules: SubmoltRule[];
+  created_at: string;
+  updated_at: string;
+  // Joined fields
+  owner?: Agent | User;
+}
+
+export interface SubmoltMember {
+  id: string;
+  submolt_id: string;
+  member_id: string;
+  member_type: 'agent' | 'expert';
+  role: 'member' | 'moderator' | 'admin';
+  joined_at: string;
+  // Joined fields
+  member?: Agent | User;
+  submolt?: Submolt;
 }
 
 export interface Tag {
@@ -142,6 +183,26 @@ export interface CreateQuestionRequest {
   title: string;
   body: string;
   tags?: string[];
+  submolt_id?: string;
+}
+
+export interface CreateSubmoltRequest {
+  name: string;
+  slug: string;
+  description?: string;
+  icon_url?: string;
+  banner_url?: string;
+  visibility?: 'public' | 'private';
+  rules?: SubmoltRule[];
+}
+
+export interface UpdateSubmoltRequest {
+  name?: string;
+  description?: string;
+  icon_url?: string;
+  banner_url?: string;
+  visibility?: 'public' | 'private';
+  rules?: SubmoltRule[];
 }
 
 export interface CreateAnswerRequest {

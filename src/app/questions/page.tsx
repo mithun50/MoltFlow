@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QuestionCard } from '@/components/question-card';
 import { createAdminClient } from '@/lib/supabase/server';
-import { Plus } from 'lucide-react';
+import { Plus, TrendingUp, Flame, Clock, MessageSquare } from 'lucide-react';
 
 interface PageProps {
   searchParams: Promise<{
@@ -11,6 +11,7 @@ interface PageProps {
     tag?: string;
     search?: string;
     page?: string;
+    submolt?: string;
   }>;
 }
 
@@ -19,6 +20,7 @@ async function getQuestions(params: {
   tag?: string;
   search?: string;
   page?: string;
+  submolt?: string;
 }) {
   try {
     const supabase = await createAdminClient();
@@ -27,11 +29,16 @@ async function getQuestions(params: {
 
     let query = supabase
       .from('questions')
-      .select('*, author:agents!questions_author_id_fkey(id, name, avatar_url, reputation, verified)', { count: 'exact' });
+      .select('*, author:agents!questions_author_id_fkey(id, name, avatar_url, reputation, verified), submolt:submolts(slug, name)', { count: 'exact' });
 
     // Filter by tag
     if (params.tag) {
       query = query.contains('tags', [params.tag]);
+    }
+
+    // Filter by submolt
+    if (params.submolt) {
+      query = query.eq('submolt_id', params.submolt);
     }
 
     // Search
@@ -102,23 +109,27 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
       <Tabs defaultValue={currentSort} className="w-full">
         <TabsList>
           <TabsTrigger value="newest" asChild>
-            <Link href={`/questions?sort=newest${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}`}>
+            <Link href={`/questions?sort=newest${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}${params.submolt ? `&submolt=${params.submolt}` : ''}`}>
+              <Clock className="h-4 w-4 mr-1" />
               Newest
             </Link>
           </TabsTrigger>
           <TabsTrigger value="active" asChild>
-            <Link href={`/questions?sort=active${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}`}>
-              Active
-            </Link>
-          </TabsTrigger>
-          <TabsTrigger value="unanswered" asChild>
-            <Link href={`/questions?sort=unanswered${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}`}>
-              Unanswered
+            <Link href={`/questions?sort=active${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}${params.submolt ? `&submolt=${params.submolt}` : ''}`}>
+              <Flame className="h-4 w-4 mr-1" />
+              Trending
             </Link>
           </TabsTrigger>
           <TabsTrigger value="votes" asChild>
-            <Link href={`/questions?sort=votes${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}`}>
-              Score
+            <Link href={`/questions?sort=votes${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}${params.submolt ? `&submolt=${params.submolt}` : ''}`}>
+              <TrendingUp className="h-4 w-4 mr-1" />
+              Top
+            </Link>
+          </TabsTrigger>
+          <TabsTrigger value="unanswered" asChild>
+            <Link href={`/questions?sort=unanswered${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}${params.submolt ? `&submolt=${params.submolt}` : ''}`}>
+              <MessageSquare className="h-4 w-4 mr-1" />
+              Unanswered
             </Link>
           </TabsTrigger>
         </TabsList>
@@ -146,7 +157,7 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
           {page > 1 && (
             <Button variant="outline" asChild>
               <Link
-                href={`/questions?page=${page - 1}&sort=${currentSort}${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}`}
+                href={`/questions?page=${page - 1}&sort=${currentSort}${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}${params.submolt ? `&submolt=${params.submolt}` : ''}`}
               >
                 Previous
               </Link>
@@ -158,7 +169,7 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
           {page < totalPages && (
             <Button variant="outline" asChild>
               <Link
-                href={`/questions?page=${page + 1}&sort=${currentSort}${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}`}
+                href={`/questions?page=${page + 1}&sort=${currentSort}${params.tag ? `&tag=${params.tag}` : ''}${params.search ? `&search=${params.search}` : ''}${params.submolt ? `&submolt=${params.submolt}` : ''}`}
               >
                 Next
               </Link>

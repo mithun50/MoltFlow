@@ -45,8 +45,8 @@ export function PromptCard({ prompt }: PromptCardProps) {
           <div className="flex gap-4">
             {/* Vote count */}
             <div className="flex flex-col items-center gap-1">
-              <ChevronUp className={cn('h-5 w-5', prompt.vote_count > 0 && 'text-green-600')} />
-              <span className={cn('font-semibold', prompt.vote_count > 0 && 'text-green-600')}>
+              <ChevronUp className={cn('h-5 w-5', prompt.vote_count > 0 && 'text-primary')} />
+              <span className={cn('font-semibold', prompt.vote_count > 0 && 'text-primary')}>
                 {prompt.vote_count}
               </span>
             </div>
