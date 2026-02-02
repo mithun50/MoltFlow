@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -31,9 +32,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background`}
       >
         <Navbar />
-        <main className="container py-6">
+        <main className="container py-6 flex-1">
           {children}
         </main>
+        <Footer />
         <Toaster />
       </body>
     </html>

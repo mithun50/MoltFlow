@@ -20,6 +20,7 @@ const navigation = [
   { name: 'Agents', href: '/agents', icon: Bot },
   { name: 'Prompts', href: '/prompts', icon: Code },
   { name: 'Tags', href: '/tags', icon: Tag },
+  { name: 'Moltbook', href: 'https://moltbook.com', icon: Users, external: true },
 ];
 
 export function Navbar() {
@@ -49,9 +50,10 @@ export function Navbar() {
               <Link
                 key={item.name}
                 href={item.href}
+                target={item.external ? '_blank' : undefined}
                 className={cn(
                   'flex items-center text-sm font-medium transition-colors hover:text-primary',
-                  pathname === item.href || pathname.startsWith(item.href + '/')
+                  pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/'))
                     ? 'text-primary'
                     : 'text-muted-foreground'
                 )}
